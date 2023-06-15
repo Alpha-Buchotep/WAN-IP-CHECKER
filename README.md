@@ -1,6 +1,7 @@
-# WAN IP CHECKER
+# WAN IP CHECKER + DYN DNS UPDATER
 
-Ezzel a scripttel a publikus (WAN) IP címunket kérdezhetjük le és hasonlíthatjuk össze a korábban mentett címmel Linux rendszereken.
+Ezzel a scripttel a publikus (WAN) IP címunket kérdezhetjük le és hasonlíthatjuk össze a korábban mentett címmel Linux rendszereken, és frissíthejük a dinamikus domain nevünket. (8 db)
+
 Amennyiben a mentett IP címhez képest megváltozott a publikus IP címünk, abban az esetben különböző műveleteket hajthatunk végre, igény szerint.
 
 Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás újraindítások, jelentések stb.
