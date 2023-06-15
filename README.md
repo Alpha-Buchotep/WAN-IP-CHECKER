@@ -1,6 +1,6 @@
-# WAN-IP CHECKER
+# WAN IP CHECKER
 
-Ezzel a scripttel a publikus (WAN) IP címunket kérdezhetjük le.
+Ezzel a scripttel a publikus (WAN) IP címunket kérdezhetjük le és hasonlíthatjuk össze a korábban mentett címmel.
 Amennyiben a mentett IP címhez képest megváltozott a publikus IP címünk, abban az esetben különböző műveleteket hajthatunk végre, igény szerint.
 
 Ezek a múveletek lehetnek dinamikus domain név frissítések, szolgáltatás újraindítások, jelentések stb.
