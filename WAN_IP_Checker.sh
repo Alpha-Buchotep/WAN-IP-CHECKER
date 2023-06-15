@@ -77,10 +77,11 @@ DYN_DOMAIN[1]="domain1.dyndns.com"
 DYN_DOMAIN[2]="domain2.dyndns.com"
 DYN_DOMAIN[3]="domain3.dyndns.com"
 DYN_DOMAIN[4]="domain4.dyndns.com"
-DYN_DOMAIN[5]="domain5.dyndns.com"
-DYN_DOMAIN[6]="domain6.dyndns.com"
-DYN_DOMAIN[7]="domain7.dyndns.com"
-DYN_DOMAIN[8]="domain8.dyndns.com"
+DYN_DOMAIN[5]=""
+DYN_DOMAIN[6]=""
+DYN_DOMAIN[7]=""
+DYN_DOMAIN[8]=""
+DYN_DOMAIN[9]=""
 
 #---------------------------------------------------------------------
 #- EGYEB VALTOZOK
@@ -253,17 +254,21 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
         # CIKLUSAL MEGYUNK VEGIG A FRISSITENDO DOMAIN NEVEKEN
         #---------------------------------------------------------------------
 
-        for i in 1 2 3 4 5 6 7 8
+		for i in 1 2 3 4 5 6 7 8 9
 
-            do
+			do
 
-		FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
-                echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..."
-                echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..." >> $LOGFAJL
-                curl "https://$DYN_UN:$DYN_UPD_KEY@members.dyndns.org/v3/update?hostname=${DYN_DOMAIN[$i]}&myip=${WANIPCIM}" --connect-timeout 15 -k -s
-		sleep 2
+				if [ ! -z "${DYN_DOMAIN[$i]}" ] ; then
 
-	done
+					FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
+					echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..."
+					echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..." >> $LOGFAJL
+					curl "https://$DYN_UN:$DYN_UPD_KEY@members.dyndns.org/v3/update?hostname=${DYN_DOMAIN[$i]}&myip=${WANIPCIM}" --connect-timeout 15 -k -s
+					sleep 2
+
+				fi
+
+		done
 
         #---------------------------------------------------------------------
         # NAPLOZAS
