@@ -1,22 +1,21 @@
 #!/bin/bash
 
 #---------------------------------------------------------------------
-#---------------------------------------------------------------------
-#---------------------------------------------------------------------
-# WAN IP CIM LEKERDEZO / ELLENORZO SCRIPT
+# WAN IP CIM LEKERDEZO / ELLENORZO / DYN DNS FRISSITO SCRIPT (PL. CRONJOB)
 # EZZEL A SCRIPTTEL 4 KULONBOZO SZOLGALTATOTOL KERDEZHETJUK LE
 # A PUBLIKUS (WAN) IP CIMUNKET. AZ ELSO VALID IP CIM LEKERDEZES UTAN
-# A SCRIPT TOVABBLEP, NEM ELLENORZI VEGIG MIND A 4 IP CÍM API-T.
-# A 4 IP API A REDUNDANCIA MIATT VAN A PROGRAMBAN.
+# A SCRIPT TOVABBLEP, NEM ELLENORZI VEGIG MIND AZ 4 IP CÍM API-T.
+# A 4 IP API A REDUNDANCIA MIATT VAN A PROGRAMBAN
 #
 # AMENNYIBEN MEGVALTOZOTT A WAN IP CIMUNK A KORABBAN MENTETTHEZ
 # KEPEST, AKKOR KULONBOZO MUVELETEKET HAJTHAUNK VEGRE, PL.
-# DINAMIKUS DNS SZOLGALATATONAL HASZNALT DOMAIN NEV / IP
+# DINAMIKUS DNS SZOLGALATATONAL HASZNALT DOMAIN NEV / IP CIM
 # FRISSITEST, SZOLGALTATASOK UJRAINDITASAT, ERTESITEST STB.
 #
 # A SCRIPT NAPLOZZA A MUKODESET
 #
-# KESZITETTE: C2H5Cl, 2019
+# IRTA: C2H5Cl, Aethyl-chloride, 2019
+# UPDATED: 2023-06-16
 #---------------------------------------------------------------------
 
 
@@ -35,14 +34,14 @@ IP_ADDR_FAJL="/var/log/wanipaddress.txt"
 #---------------------------------------------------------------------
 
 DATUM=$(date +"%Y-%m-%d")
-LOGDATUM=$(date +"%Y-%m")
+LOGDATUM=$(date +"%Y-%m-%d")
 FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 
 LOGFAJL_DIR="/var/log/WANIPChange"
 LOGFAJL="$LOGFAJL_DIR/$LOGDATUM.txt"
 
 #---------------------------------------------------------------------
-#- UPDATE URL CIMEK + BARATSAGOS NEVEK
+#- IP API URL CIMEK + BARATSAGOS NEVEK
 #---------------------------------------------------------------------
 
 UPD_URL[1]="https://api.ipify.org"
@@ -56,6 +55,32 @@ UPD_URL_NAME[3]="IPECHO.NET"
 
 UPD_URL[4]="https://api.seeip.org/"
 UPD_URL_NAME[4]="SEEIP.ORG"
+
+#---------------------------------------------------------------------
+#- LEGYEN WAN IP VALTOZASKOR DYN DNS FRISSITES (igen / nem)
+#---------------------------------------------------------------------
+
+DYN_UPDATE="nem"
+
+#---------------------------------------------------------------------
+#- DYN DNS USER NAME / UPDATE KEY
+#---------------------------------------------------------------------
+
+DYN_UN="userName"
+DYN_UPD_KEY="1234567890abcdef1234567890abcde"
+
+#---------------------------------------------------------------------
+#- DYN DNS FRISSITENDO DOMAIN NEVEK
+#---------------------------------------------------------------------
+
+DYN_DOMAIN[1]="domain1.dyndns.com"
+DYN_DOMAIN[2]="domain2.dyndns.com"
+DYN_DOMAIN[3]="domain3.dyndns.com"
+DYN_DOMAIN[4]="domain4.dyndns.com"
+DYN_DOMAIN[5]="domain5.dyndns.com"
+DYN_DOMAIN[6]="domain6.dyndns.com"
+DYN_DOMAIN[7]="domain7.dyndns.com"
+DYN_DOMAIN[8]="domain8.dyndns.com"
 
 #---------------------------------------------------------------------
 #- EGYEB VALTOZOK
@@ -80,29 +105,34 @@ fi
 #- START WAN IP CHECK + UPDATE
 #---------------------------------------------------------------------
 
+echo "$FULLDATUM - IP CHECK ELINDULT..."
 echo "$FULLDATUM - IP CHECK ELINDULT..." >> $LOGFAJL
 
 #---------------------------------------------------------------------
 # CIKLUSAL MEGYUNK VEGIG A FRISSITESI SZOLGALTATOKON
-# AZ ELSO SIKERES WAN IP LEKERDEZEST KOVETOEN KILEPUNK A CIKLUSBOL
+# AMINT SIKERESEN LEKERDEZZUK A WAN IP CIMET, KILEPUNK A CIKLUSBOL
 # HA NEM SIKERUL, ARROL UZENETET KULDUNK ES NAPLOZZUK IS
 #---------------------------------------------------------------------
 
 for i in 1 2 3 4
+
     do
         echo "$FULLDATUM - ${UPD_URL[$i]} - WAN IP LEKERDEZESE..."
+        echo "$FULLDATUM - ${UPD_URL[$i]} - WAN IP LEKERDEZESE..." >> $LOGFAJL
         WANIPCIM=$(curl "${UPD_URL[$i]}" --connect-timeout 20 -k -s)
         UPDSVC=${UPD_URL_NAME[$i]}
-	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
+		FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 
 	#---------------------------------------------------------------------
 
 	if [[ "$WANIPCIM" =~ ^(([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))$ ]] ; then
 	    # Okay - valid IP cim
+	    echo "$FULLDATUM - ${UPD_URL[$i]} - VALID IP CIM: $WANIPCIM"
 	    echo "$FULLDATUM - ${UPD_URL[$i]} - VALID IP CIM: $WANIPCIM" >> $LOGFAJL
 	    break
 	else
-	    # Nem Okay - nem valid az IP cim
+	    # Nem Okay - nem valid IP cim
+	    echo "$FULLDATUM - ${UPD_URL[$i]} - NEM VALID IP CIM: $WANIPCIM"
 	    echo "$FULLDATUM - ${UPD_URL[$i]} - NEM VALID IP CIM: $WANIPCIM" >> $LOGFAJL
 	    WANIPCIM="x"
 	fi
@@ -121,7 +151,7 @@ if [ -z "$WANIPCIM" ] || [ $WANIPCIM == "x" ] ; then
     #---------------------------------------------------------------------
 	MENTETTWANIP=$(head -n 1 $IP_ADDR_FAJL)
     else
-	MENTETTWANIP="--------------- NINCS IPCIM.TXT FAJL"
+	MENTETTWANIP="NINCS IPCIM.TXT FAJL"
     fi
 
     #---------------------------------------------------------------------
@@ -140,11 +170,7 @@ if [ -z "$WANIPCIM" ] || [ $WANIPCIM == "x" ] ; then
 fi
 
 #---------------------------------------------------------------------
-#---------------------------------------------------------------------
-#---------------------------------------------------------------------
 # Megnezzuk, van-e ipcim.txt fajl a megadott mappaban
-#---------------------------------------------------------------------
-#---------------------------------------------------------------------
 #---------------------------------------------------------------------
 
 if [ -f "$IP_ADDR_FAJL" ] ; then
@@ -192,7 +218,6 @@ if [ $WANIPCIM == $MENTETTWANIP ] ; then
     FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
     FRISSITSUNK="no"
     echo "$FULLDATUM - NINCS WAN IP VALTOZAS!"
-    echo ""
     sleep 1
 
 else
@@ -201,8 +226,7 @@ else
     FRISSITSUNK="yes"
     echo ${WANIPCIM}>$IP_ADDR_FAJL
     sleep 1
-    echo "$FULLDATUM - VAN WAN IP VALTOZAS!"
-    echo ""
+    echo "$FULLDATUM - VAN WAN IP VALTOZOTT!"
     sleep 1
 
 fi
@@ -217,11 +241,49 @@ fi
 
 if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 
-    #---------------------------------------------------------------------
-    # DynDNS FRISSITES - TIMEOUT 20 SEC (CSAK PELDA, AZ ADATOK NEM VALOSAK)
-    #---------------------------------------------------------------------
+	#---------------------------------------------------------------------
+	# HA A DYN_UPDATE ERTEKE IGEN, AKKOR FRISSITJUK A DYN DNS NEVEKET
+	#---------------------------------------------------------------------
 
-    #curl "https://felhasznalonev:update_key@members.dyndns.org/v3/update?hostname=domain.dyndns.com&myip=${WANIPCIM}" --connect-timeout 20 -k -s
+	if [ $DYN_UPDATE == "igen" ] ; then
+
+        #---------------------------------------------------------------------
+        # DynDNS FRISSITES - TIMEOUT 15 SEC
+        #---------------------------------------------------------------------
+        # CIKLUSAL MEGYUNK VEGIG A FRISSITENDO DOMAIN NEVEKEN
+        #---------------------------------------------------------------------
+
+        for i in 1 2 3 4 5 6 7 8
+
+            do
+
+		FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
+                echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..."
+                echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..." >> $LOGFAJL
+                curl "https://$DYN_UN:$DYN_UPD_KEY@members.dyndns.org/v3/update?hostname=${DYN_DOMAIN[$i]}&myip=${WANIPCIM}" --connect-timeout 15 -k -s
+		sleep 2
+
+	done
+
+        #---------------------------------------------------------------------
+        # NAPLOZAS
+        #---------------------------------------------------------------------
+
+	FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
+
+        echo "$FULLDATUM - ORACLE / DynDNS FRISSITESEK BEFEJEZVE... SERVICEK UJRAINNDITASA..."
+        echo "$FULLDATUM - ORACLE / DynDNS FRISSITESEK BEFEJEZVE..." >> $LOGFAJL
+        echo "$FULLDATUM - SERVICEK UJRAINDITASA..." >> $LOGFAJL
+        sleep 1
+
+        #---------------------------------------------------------------------
+
+    else
+
+	echo "$FULLDATUM - DYN DNS FRISSITES KIKAPCSOLVA..."
+	echo "$FULLDATUM - DYN DNS FRISSITES KIKAPCSOLVA..." >> $LOGFAJL
+
+    fi
 
     #---------------------------------------------------------------------
     # VSFTPD SERVICE LEALLITASA
@@ -230,14 +292,14 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
     FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
     echo "$FULLDATUM - VSFTPD LEALLITASA..."
     # systemctl stop vsftpd.service
-    # sleep 2
+    sleep 2
 
     #---------------------------------------------------------------------
     # NGINX SERVICE LEALLITASA
     #---------------------------------------------------------------------
 
-    FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-    echo "$FULLDATUM - NGINX LEALLITASA..."
+    # FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
+    # echo "$FULLDATUM - NGINX LEALLITASA..."
     # systemctl stop nginx.service
     # sleep 2
 
@@ -245,8 +307,8 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
     # PHP-FPM SERVICE LEALLITASA
     #---------------------------------------------------------------------
 
-    FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-    echo "$FULLDATUM - PHP72-FPM LEALLITASA..."
+    # FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
+    # echo "$FULLDATUM - PHP72-FPM LEALLITASA..."
     # systemctl stop php72-php-fpm.service
     # sleep 2
 
@@ -256,14 +318,14 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
     #---------------------------------------------------------------------
 
     FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-    echo "$FULLDATUM - SERVICEK LEALLITVA... WAN IP VALTOZAS" >> $LOGFAJL
+    echo "$FULLDATUM - SERVICEK LEALLITVA... WAN IP VALTOZOTT" >> $LOGFAJL
 
     #---------------------------------------------------------------------
     # PHP-FPM SERVICE INDITASA
     #---------------------------------------------------------------------
 
-    FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-    echo "$FULLDATUM - PHP72-FPM INDITASA..."
+    # FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
+    # echo "$FULLDATUM - PHP72-FPM INDITASA..."
     # systemctl start php72-php-fpm.service
     # sleep 2
 
@@ -271,8 +333,8 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
     # NGINX SERVICE INDITASA
     #---------------------------------------------------------------------
 
-    FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-    echo "$FULLDATUM - NGINX INDITASA..."
+    # FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
+    # echo "$FULLDATUM - NGINX INDITASA..."
     # systemctl start nginx.service
     # sleep 2
 
@@ -283,7 +345,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
     FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
     echo "$FULLDATUM - VSFTPD INDITASA..."
     # systemctl start vsftpd.service
-    # sleep 2
+    sleep 2
 
     #---------------------------------------------------------------------
     # NAPLOZAS
@@ -291,7 +353,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 
     FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
     echo "$FULLDATUM - FRISSITES KESZ... ($UPDSVC)"
-    echo "$FULLDATUM - SERVICEK UJRAINDITVA... WAN IP VALTOZAS" >> $LOGFAJL
+    echo "$FULLDATUM - SERVICEK UJRAINDITVA... WAN IP VALTOZOTT" >> $LOGFAJL
     echo "$FULLDATUM - ELOZO WAN IP: $MENTETTWANIP" >> $LOGFAJL
     echo "$FULLDATUM - AKTUALIS WAN IP: $WANIPCIM" >> $LOGFAJL
     echo "$FULLDATUM - FRISSITESI SZOLGALTATAS: $UPDSVC" >> $LOGFAJL
