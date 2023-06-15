@@ -254,27 +254,25 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
         # CIKLUSAL MEGYUNK VEGIG A FRISSITENDO DOMAIN NEVEKEN
         #---------------------------------------------------------------------
 
-		for i in 1 2 3 4 5 6 7 8 9
+				for i in 1 2 3 4 5 6 7 8 9
 
-			do
+				do
 
-				if [ ! -z "${DYN_DOMAIN[$i]}" ] ; then
+					if [ ! -z "${DYN_DOMAIN[$i]}" ] ; then
+						FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
+						echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..."
+						echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..." >> $LOGFAJL
+						curl "https://$DYN_UN:$DYN_UPD_KEY@members.dyndns.org/v3/update?hostname=${DYN_DOMAIN[$i]}&myip=${WANIPCIM}" --connect-timeout 15 -k -s
+						sleep 2
+					fi
 
-					FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
-					echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..."
-					echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..." >> $LOGFAJL
-					curl "https://$DYN_UN:$DYN_UPD_KEY@members.dyndns.org/v3/update?hostname=${DYN_DOMAIN[$i]}&myip=${WANIPCIM}" --connect-timeout 15 -k -s
-					sleep 2
-
-				fi
-
-		done
+				done
 
         #---------------------------------------------------------------------
         # NAPLOZAS
         #---------------------------------------------------------------------
 
-	FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
+				FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
 
         echo "$FULLDATUM - ORACLE / DynDNS FRISSITESEK BEFEJEZVE... SERVICEK UJRAINNDITASA..."
         echo "$FULLDATUM - ORACLE / DynDNS FRISSITESEK BEFEJEZVE..." >> $LOGFAJL
@@ -285,8 +283,8 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 
     else
 
-	echo "$FULLDATUM - DYN DNS FRISSITES KIKAPCSOLVA..."
-	echo "$FULLDATUM - DYN DNS FRISSITES KIKAPCSOLVA..." >> $LOGFAJL
+			echo "$FULLDATUM - DYN DNS FRISSITES KIKAPCSOLVA..."
+			echo "$FULLDATUM - DYN DNS FRISSITES KIKAPCSOLVA..." >> $LOGFAJL
 
     fi
 
