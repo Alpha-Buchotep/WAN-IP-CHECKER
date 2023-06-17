@@ -7,3 +7,5 @@ Amennyiben a mentett IP címhez képest megváltozott a publikus IP címünk, ab
 Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás újraindítások, jelentések stb.
 
 A script beállításaiban 4 db publikus IP API szolgáltatót lehet beállítani a redundancia miatt. Az első valid IP címet visszaadó lekérdezést követően a scrript továbblép, nem ellenőrzi le mind a 4 szolgáltatótól a WAN IP címünket.
+
+A script csak az IPv4 címeket ellenőrzi.
