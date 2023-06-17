@@ -1,4 +1,4 @@
-# WAN IP CHECKER + DYN DNS UPDATER (IPv4 + IPv6)
+## WAN IP CHECKER + DYN DNS UPDATER (IPv4 + IPv6)
 
 Ezzel a scripttel a publikus (WAN) IP címunket kérdezhetjük le tetszőleges számú szolgáltatótól. A script a lekérdezést követően összehasonlítja a lekérdezés eredményét a korábban fájlba mentett IP címmel.
 
@@ -6,30 +6,44 @@ Amennyiben a mentett IP címhez képest megváltozott a publikus IP címünk, ab
 
 Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás újraindítások, jelentések stb. 
 
-A script a **${\color{yellow}dyn.com}$** és a **${\color{yellow}noip.com}$** szolgáltatókkal működik.
+A script a **${\color{yellow}dyn.com}$** és a **${\color{yellow}no&#8208;ip.com}$** szolgáltatókkal működik.
 
 A script beállításaiban korlátlan számú publikus IP API szolgáltatót lehet beállítani a redundancia miatt. Az első valid IP címet visszaadó lekérdezést követően a scrript továbblép, nem ellenőrzi le az összes beállított szolgáltatótól a WAN IP címünket.
 
 
-Pl.:
+**Példa egy új IP API szolgáltató felvételére:**
 
 ```
-UPD_URL[5]="https://pelda.org.hu/"
-UPD_URL_NAME[5]="PELDA.ORG.HU"
+
+UPD_URL[5]="https://api.peldaip.org.hu/"
+UPD_URL_NAME[5]="PELDAIP.ORG.HU"
+
+UPD_URL[...]="https://api.ex.org.hu/"
+UPD_URL_NAME[...]="EX.ORG.HU"
+
+UPD_URL[10]="https://api.iphuex15.org.hu/"
+UPD_URL_NAME[10]="IPHUEX15.ORG.HU"
+
+stb.
 ```
 
-A script beállításaiben korlátlan számú dinamikus domain nevet lehet beállítani.
+A script beállításaiben korlátlan számú frissítendő dinamikus domain nevet lehet beállítani.
 
 
-Pl.:
+**Példa egy új dinamikus domain felvételére:**
 
 ```
+
 DYN_DOMAIN[4]="pelda.dyndns.com"
-```
 
+DYN_DOMAIN[...]="xxx.dyndns.com"
+
+DYN_DOMAIN[15]="domain15.dyndns.com"
+
+stb.
+```
 
 ### A script az IPv4 és IPv6 címeket is kezeli.
-
 
 ### Konzol kimenet
 
@@ -77,3 +91,4 @@ DYN_DOMAIN[4]="pelda.dyndns.com"
 2023-06-17 22-51-21 - FRISSITESI SZOLGALTATAS: IPIFY.ORG
 
 ```
+
