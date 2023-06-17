@@ -6,7 +6,7 @@ Amennyiben a mentett IP címhez képest megváltozott a publikus IP címünk, ab
 
 Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás újraindítások, jelentések stb. 
 
-A script a **${\color{yellow}dyn.com}$** és a **${\color{yellow}no&#8208;ip.com}$** szolgáltatókkal működik.
+A script az **${\color{yellow}IPv4}$** és **${\color{yellow}IPv6}$** címeket is kezeli és a **${\color{yellow}dyn.com}$** valamint a **${\color{yellow}no&#8208;ip.com}$** szolgáltatókkal működik.
 
 A script beállításaiban korlátlan számú publikus IP API szolgáltatót lehet beállítani a redundancia miatt. Az első valid IP címet visszaadó lekérdezést követően a script továbblép, nem ellenőrzi le az összes beállított szolgáltatótól a WAN IP címünket.
 
@@ -43,9 +43,13 @@ DYN_DOMAIN[15]="domain15.dyndns.com"
 stb.
 ```
 
-### A script az IPv4 és IPv6 címeket is kezeli.
+**TESZTELVE:**
 
-### Konzol kimenet
+* Oracle Linux 9.2
+* CentOS 7.9
+
+
+#### Konzol kimenet
 
 ```
 
