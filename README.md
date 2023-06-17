@@ -1,4 +1,4 @@
-# WAN IP CHECKER + DYN DNS UPDATER
+# WAN IP CHECKER + DYN DNS UPDATER (IPv4 + IPv6)
 
 Ezzel a scripttel a publikus (WAN) IP címunket kérdezhetjük le és hasonlíthatjuk össze a korábban mentett címmel Linux rendszereken, és frissíthejük a dinamikus domain nevünket. (9 db)
 
@@ -8,4 +8,4 @@ Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás �
 
 A script beállításaiban 4 db publikus IP API szolgáltatót lehet beállítani a redundancia miatt. Az első valid IP címet visszaadó lekérdezést követően a scrript továbblép, nem ellenőrzi le mind a 4 szolgáltatótól a WAN IP címünket.
 
-A script csak az IPv4 címeket ellenőrzi.
+A script az IPv4 és IPv6 címeket is kezeli.
