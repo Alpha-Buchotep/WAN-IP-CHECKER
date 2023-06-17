@@ -145,12 +145,13 @@ for i in 1 2 3 4
 			# Okay - valid IP cím
 			echo "$FULLDATUM - ${UPD_URL[$i]} - VALID IP CIM: $WANIPCIM"
 			echo "$FULLDATUM - ${UPD_URL[$i]} - VALID IP CIM: $WANIPCIM" >> $LOGFAJL
-
+			# Valid IP címet kaptunk a lekérdezés során, kilépünk a cilusból
 			break
 
 		else
 
 			# Nem Okay - nem valid az IP cím
+			# Nem kaptunk valid IP címet, folytatjuk a ciklust
 			echo "$FULLDATUM - ${UPD_URL[$i]} - NEM VALID IP CIM: $WANIPCIM"
 			echo "$FULLDATUM - ${UPD_URL[$i]} - NEM VALID IP CIM: $WANIPCIM" >> $LOGFAJL
 
@@ -216,17 +217,18 @@ if [ -f "$IP_ADDR_FAJL" ] ; then
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	IPCIMTXT="Ok"
-
-	echo "$FULLDATUM - VAN IP CIM FAJL..."
 	MENTETTWANIP=$(head -n 1 $IP_ADDR_FAJL)
+
+	echo "$FULLDATUM - IP CIM TXT FAJL $IP_ADDR_FAJL LETEZIK..."
+	echo "$FULLDATUM - IP CIM TXT FAJL $IP_ADDR_FAJL LETEZIK" >> $LOGFAJL
 	echo "$FULLDATUM - JELENLEGI WAN IP CIM: $WANIPCIM"
 	echo "$FULLDATUM - KORABBI WAN IP CIM: $MENTETTWANIP"
-	echo "$FULLDATUM - IP CIM TXT $IP_ADDR_FAJL LETEZIK" >> $LOGFAJL
 
 else
 
 	#---------------------------------------------------------------------
-	# Nincs ipcim.txt fájl, létrehozzuk + beírjuk az aktuális WAN IP-t
+	# Nincs ipcim.txt fájl, létrehozzuk + beírjuk a 0.0.0.0 IP-t a fájlba
+	# Ezt később frissítjük az aktuális WAN IP címre
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
@@ -234,10 +236,10 @@ else
 	MENTETTWANIP="0.0.0.0"
 
 	echo "0.0.0.0">$IP_ADDR_FAJL
-	echo "$FULLDATUM - NINCS IP CIM FAJL..."
-	echo "$FULLDATUM - A $IP_ADDR_FAJL LETREHOZVA! (0.0.0.0)"
+	echo "$FULLDATUM - IP CIM TXT FAJL $IP_ADDR_FAJL NEM LETEZIK..."
+	echo "$FULLDATUM - IP CIM TXT FAJL $IP_ADDR_FAJL NEM LETEZIK - LETREHOZVA (0.0.0.0)" >> $LOGFAJL
+	echo "$FULLDATUM - A $IP_ADDR_FAJL LETREHOZVA (0.0.0.0)"
 	echo "$FULLDATUM - JELENLEGI IP CIM: $WANIPCIM"
-	echo "$FULLDATUM - NINCS IP CIM TXT - LETREHOZVA" >> $LOGFAJL
 
 fi
 
@@ -255,6 +257,8 @@ else
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	FRISSITSUNK="yes"
+
+	# Beírjuk az aktuális WAN IP címet a TXT fájlba
 	echo ${WANIPCIM}>$IP_ADDR_FAJL
 	echo "$FULLDATUM - WAN IP VALTOZOTT"
 
@@ -264,6 +268,7 @@ fi
 # Ha a korábbi WAN IP nem egyezik a most lekérdezettel, vagy
 # nem létezett a WAN IP címet tartalmazó fájl, akkor az alábbi
 # műveleteket hajtjuk végre.
+#
 # Ezek lehetnek szolgáltatás újraindítások, dinamikus DNS rekordok
 # frissítései, bármi egyéb, az alábbiak csak példák
 #---------------------------------------------------------------------
@@ -381,7 +386,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 	sleep 2
 
 	#---------------------------------------------------------------------
-	# NAPLÓZÁS
+	# WAN IP CÍM MEGVÁLTOZOTT - NAPLÓZÁS
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
@@ -396,7 +401,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 else
 
 	#---------------------------------------------------------------------
-	# NAPLÓZÁS
+	# NINCS VÁLTOZÁS - NAPLÓZÁS
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
