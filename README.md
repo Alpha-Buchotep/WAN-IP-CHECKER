@@ -4,7 +4,7 @@ Ezzel a scripttel a publikus (WAN) IP címunket kérdezhetjük le tetszőleges s
 
 Amennyiben a mentett IP címhez képest megváltozott a publikus IP címünk, abban az esetben különböző műveleteket hajthatunk végre, igény szerint.
 
-Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás újraindítások, jelentések stb.
+Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás újraindítások, jelentések stb. A script a dyn.com és a noip.com szolgáltatókkal működik.
 
 A script beállításaiban korlátlan számú publikus IP API szolgáltatót lehet beállítani a redundancia miatt. Az első valid IP címet visszaadó lekérdezést követően a scrript továbblép, nem ellenőrzi le az összes beállított szolgáltatótól a WAN IP címünket.
 
