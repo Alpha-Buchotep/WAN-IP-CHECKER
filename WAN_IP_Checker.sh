@@ -297,6 +297,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 
 		    # DynDNS UPDATE
 		    #curl "https://$DYN_UN:$DYN_UPD_KEY@members.dyndns.org/v3/update?hostname=${DYN_DOMAIN[$i]}&myip=${WANIPCIM}" --connect-timeout 15 -k -s
+		    sleep 2
 
 		fi
 
