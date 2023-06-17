@@ -8,7 +8,7 @@ Ezek a műveletek lehetnek dinamikus domain név frissítések, szolgáltatás �
 
 A script a **${\color{yellow}dyn.com}$** és a **${\color{yellow}no&#8208;ip.com}$** szolgáltatókkal működik.
 
-A script beállításaiban korlátlan számú publikus IP API szolgáltatót lehet beállítani a redundancia miatt. Az első valid IP címet visszaadó lekérdezést követően a scrript továbblép, nem ellenőrzi le az összes beállított szolgáltatótól a WAN IP címünket.
+A script beállításaiban korlátlan számú publikus IP API szolgáltatót lehet beállítani a redundancia miatt. Az első valid IP címet visszaadó lekérdezést követően a script továbblép, nem ellenőrzi le az összes beállított szolgáltatótól a WAN IP címünket.
 
 
 **Példa egy új IP API szolgáltató felvételére:**
