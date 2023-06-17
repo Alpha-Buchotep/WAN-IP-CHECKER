@@ -27,7 +27,7 @@ UPD_URL_NAME[10]="IPHUEX15.ORG.HU"
 stb.
 ```
 
-A script beállításaiben korlátlan számú frissítendő dinamikus domain nevet lehet beállítani.
+A script beállításaiban korlátlan számú frissítendő dinamikus domain nevet lehet beállítani.
 
 
 **Példa egy új dinamikus domain felvételére:**
