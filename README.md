@@ -44,8 +44,8 @@ stb.
 
 **TESZTELVE:**
 
-* Oracle Linux 9.2
-* CentOS 7.9
+* Oracle Linux 9.2 x64
+* CentOS Linux 7.9.2009 x64
 
 
 #### Konzol kimenet
