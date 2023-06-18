@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #---------------------------------------------------------------------
-# WAN IP CÍM LEKÉRDEZŐ / ELLENŐRZŐ / DYN DNS FRISSÍTŐ SCRIPT
+# WAN IP CÍM LEKÉRDEZŐ / ELLENŐRZŐ SCRIPT / DYN DNS FRISSÍTŐ
 # EZZEL A SCRIPTTEL TETSZŐLEGES SZÁMÚ SZOLGÁLTATÓTÓL KÉRDEZHETJÜK LE
 # A PUBLIKUS (WAN) IP CÍMÜNKET. AZ ELSŐ VALID IP CÍM LEKÉRDEZÉS UTÁN
 # A SCRIPT TOVÁBBLÉP, NEM ELLENŐRZI VÉGIG AZ ÖSSZES IP CÍM API-T.
@@ -22,17 +22,20 @@
 # FRISSÍTVE: 2023-06-18
 #---------------------------------------------------------------------
 
+
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
 #---------------------------------------------------------------------
 #--------------------------- BEÁLLÍTÁSOK -----------------------------
 #---------------------------------------------------------------------
-
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
 
 #---------------------------------------------------------------------
 #- WAN IP TEXT FÁJL ABSOLUTE PATH
 #---------------------------------------------------------------------
 
 IP_ADDR_FAJL="/var/log/wanipaddress.txt"
-
 
 #---------------------------------------------------------------------
 #- DÁTUMOK + LOG FÁJL DIR + FÁJL
@@ -44,7 +47,6 @@ FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 
 LOGFAJL_DIR="/var/log/WANIPChange"
 LOGFAJL="$LOGFAJL_DIR/$LOGDATUM.txt"
-
 
 #---------------------------------------------------------------------
 # IP API URL CÍMEK + BARÁTSÁGOS NEVEK
@@ -64,13 +66,11 @@ UPD_URL_NAME[3]="IPECHO.NET"
 UPD_URL[4]="https://api.seeip.org/"
 UPD_URL_NAME[4]="SEEIP.ORG"
 
-
 #---------------------------------------------------------------------
 #- DINAMIKUS IP / HOSTNAME SZOLGÁLTATÓ (dyn.com / noip.com)
 #---------------------------------------------------------------------
 
 DYN_PROVIDER="dyn.com"
-
 
 #---------------------------------------------------------------------
 #- LEGYEN WAN IP VÁLTOZÁSKOR DYN DNS FRISSITES (igen / nem)
@@ -78,22 +78,19 @@ DYN_PROVIDER="dyn.com"
 
 DYN_UPDATE="igen"
 
-
 #---------------------------------------------------------------------
 #- DYN DNS USER / UPDATE KEY
 #---------------------------------------------------------------------
 
-DYN_UN="userName"
-DYN_UPD_KEY="1234567890abcdef1234567890abcde"
-
+DYN_UN="dynUserName"
+DYN_UPD_KEY="DynUpdaterKey"
 
 #---------------------------------------------------------------------
 #- NOIP USER / PASSWORD
 #---------------------------------------------------------------------
 
-NOIP_UN="userName"
-NOIP_PWD="password"
-
+NOIP_UN="noipUserName"
+NOIP_PWD="noipPassword"
 
 #---------------------------------------------------------------------
 # FRISSITENDO DOMAIN NEVEK
@@ -105,6 +102,20 @@ DYN_DOMAIN[1]="domain1.dyndns.com"
 DYN_DOMAIN[2]="domain2.dyndns.com"
 DYN_DOMAIN[3]="domain3.dyndns.com"
 
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
+#------------------------- BEÁLLÍTÁSOK VÉGE --------------------------
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
+
+#---------------------------------------------------------------------
+#- START WAN IP CHECK + UPDATE
+#---------------------------------------------------------------------
+
+echo "$FULLDATUM - IP CHECK ELINDULT..."
+echo "$FULLDATUM - IP CHECK ELINDULT..." >> $LOGFAJL
 
 #---------------------------------------------------------------------
 #- IP API SZOLGÁLTATÓK + DYN DNS DOMAINEK SZÁMLÁLÁSA
@@ -113,36 +124,81 @@ DYN_DOMAIN[3]="domain3.dyndns.com"
 UPD_URL_LEN=${#UPD_URL[@]}
 DYN_DOMAIN_LEN=${#DYN_DOMAIN[@]}
 
+#---------------------------------------------------------------------
+#- ELLENŐRZÉSEK
+#---------------------------------------------------------------------
+
+if [ -z $UPD_URL_LEN ] || [ $UPD_URL_LEN == 0 ] ; then
+
+	# NINCS IP API
+	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
+	echo "$FULLDATUM - NINCS HASZNALHATO IP API URL! - KILEPES"
+	echo "$FULLDATUM - NINCS HASZNALHATO IP API URL! - KILEPES" >> $LOGFAJL
+	exit 0;
+
+fi
 
 #---------------------------------------------------------------------
-# DINAMIKUS IP / DNS SZOLGÁLTATÓ BEÁLLÍTÁSOK + USER AGENT
+
+if [ -z $DYN_PROVIDER ] || [ $DYN_PROVIDER == "" ] ; then
+
+	DYN_PROVIDER=""
+	DYN_UPDATE="nem"
+
+fi
+
+#---------------------------------------------------------------------
+
+if [ -z $DYN_UPDATE ] || [ $DYN_UPDATE == "" ] ; then
+
+	DYN_PROVIDER=""
+	DYN_UPDATE="nem"
+
+fi
+
+#---------------------------------------------------------------------
+
+if [ -z $DYN_DOMAIN_LEN ] || [ $DYN_DOMAIN_LEN == 0 ] ; then
+
+	# NINCS DINAMIKUS DOMAIN
+	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
+	echo "$FULLDATUM - NINCS HASZNALHATO DYN DOMAIN!"
+	echo "$FULLDATUM - NINCS HASZNALHATO DYN DOMAIN!" >> $LOGFAJL
+
+	DYN_PROVIDER=""
+	DYN_UPDATE="nem"
+
+fi
+
+#---------------------------------------------------------------------
+#- DINAMIKUS IP / DNS SZOLGÁLTATÓ BEÁLLÍTÁSOK + USER AGENT
 #---------------------------------------------------------------------
 
 DYN_USER_AGENT="bash-curl-cron/1.0 anonymous@mail.wxyz"
 
-# DYN.COM
-if [ $DYN_PROVIDER == "dyn.com" ] ; then
+# dyn.com
+if [ ! -z $DYN_PROVIDER ] && [ $DYN_PROVIDER == "dyn.com" ] ; then
 
 	#---------------------------------------------------------------------
-	# DYN.COM UPDATE URL + PARAMETERS
+	#- DYN.COM UPDATE URL + PARAMETERS
 	#---------------------------------------------------------------------
 
 	DYN_UPD_URL="https://${DYN_UN}:${DYN_UPD_KEY}@members.dyndns.org/v3/update"
 	DYN_UPD_URL_PARAM1="hostname"
 	DYN_UPD_URL_PARAM2="myip"
 
-# NOIP.COM
-elif [ $DYN_PROVIDER == "noip.com" ] ; then
+# no-ip.com
+elif [ ! -z $DYN_PROVIDER ] && [ $DYN_PROVIDER == "noip.com" ] ; then
 
 	#---------------------------------------------------------------------
-	# NOIP.COM UPDATE URL + PARAMETERS
+	#- NOIP.COM UPDATE URL + PARAMETERS
 	#---------------------------------------------------------------------
 
 	DYN_UPD_URL="https://${NOIP_UN}:${NOIP_PWD}@dynupdate.no-ip.com/nic/update"
 	DYN_UPD_URL_PARAM1="hostname"
 	DYN_UPD_URL_PARAM2="myip"
 
-# NOPE
+# none
 else
 
 	DYN_UPDATE="nem"
@@ -169,13 +225,6 @@ if [ ! -d "$LOGFAJL_DIR" ] ; then
 fi
 
 #---------------------------------------------------------------------
-#- START WAN IP CHECK + UPDATE
-#---------------------------------------------------------------------
-
-echo "$FULLDATUM - IP CHECK ELINDULT..."
-echo "$FULLDATUM - IP CHECK ELINDULT..." >> $LOGFAJL
-
-#---------------------------------------------------------------------
 # CIKLUSSAL MEGYÜNK VÉGIG A FRISSÍTÉSI SZOLGÁLTATÓKON
 # AMINT SIKERESEN LEKÉRDEZZÜK A WAN IP CÍMET, KILÉPÜNK A CIKLUSBÓL
 # HA NEM SIKERÜL LEKÉRDEZNI A WAN IP CÍMET EGYIK SZOLGÁLTATÓTÓL SEM,
@@ -186,6 +235,7 @@ for (( i=0; i<=${UPD_URL_LEN}; i++ )) ; do
 
 	if [ ! -z "${UPD_URL[$i]}" ] ; then
 
+		FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 		echo "$FULLDATUM - ${UPD_URL[$i]} - WAN IP LEKERDEZESE..."
 		echo "$FULLDATUM - ${UPD_URL[$i]} - WAN IP LEKERDEZESE..." >> $LOGFAJL
 		WANIPCIM=$(curl "${UPD_URL[$i]}" --connect-timeout 20 -k -s)
@@ -223,7 +273,7 @@ for (( i=0; i<=${UPD_URL_LEN}; i++ )) ; do
 done
 
 #---------------------------------------------------------------------
-# NEM SIKERÜLT A WAN IP LEKÉRDEZÉSE - NAPLÓZUNK, MAJD KILÉPÜNK
+#- NEM SIKERÜLT A WAN IP LEKÉRDEZÉSE - NAPLÓZUNK, MAJD KILÉPÜNK
 #---------------------------------------------------------------------
 
 if [ -z "$WANIPCIM" ] || [ $WANIPCIM == "x" ] ; then
@@ -231,7 +281,7 @@ if [ -z "$WANIPCIM" ] || [ $WANIPCIM == "x" ] ; then
 	if [ -f "$IP_ADDR_FAJL" ] ; then
 
 		#---------------------------------------------------------------------
-		# Van ipcim.txt fájl, beszívjuk a tartalmát
+		#- Van ipcim.txt fájl, beszívjuk a tartalmát
 		#---------------------------------------------------------------------
 
 		MENTETTWANIP=$(head -n 1 $IP_ADDR_FAJL)
@@ -239,7 +289,7 @@ if [ -z "$WANIPCIM" ] || [ $WANIPCIM == "x" ] ; then
 	else
 
 		#---------------------------------------------------------------------
-		# Nincs ipcim.txt fájl
+		#- Nincs ipcim.txt fájl
 		#---------------------------------------------------------------------
 
 		MENTETTWANIP="NINCS IPCIM.TXT FAJL"
@@ -264,13 +314,13 @@ if [ -z "$WANIPCIM" ] || [ $WANIPCIM == "x" ] ; then
 fi
 
 #---------------------------------------------------------------------
-# Megnezzük, van-e ipcim.txt fájl a megadott mappában
+#- Megnezzük, van-e ipcim.txt fájl a megadott mappában
 #---------------------------------------------------------------------
 
 if [ -f "$IP_ADDR_FAJL" ] ; then
 
 	#---------------------------------------------------------------------
-	# Van ipcim.txt fájl, beszívjuk a tartalmát
+	#- Van ipcim.txt fájl, beszívjuk a tartalmát
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
@@ -292,7 +342,7 @@ else
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	IPCIMTXT="nOk"
 	MENTETTWANIP="0.0.0.0"
-	
+
 	echo "0.0.0.0">$IP_ADDR_FAJL
 	echo "$FULLDATUM - IP CIM TXT FAJL $IP_ADDR_FAJL NEM LETEZIK..."
 	echo "$FULLDATUM - IP CIM TXT FAJL $IP_ADDR_FAJL NEM LETEZIK - LETREHOZVA (0.0.0.0)" >> $LOGFAJL
@@ -302,7 +352,7 @@ else
 fi
 
 #---------------------------------------------------------------------
-# Ellenőrizzük, hogy a mentett WAN IP egyezik-e a jelenlegivel
+#- Ellenőrizzük, hogy a mentett WAN IP egyezik-e a jelenlegivel
 #---------------------------------------------------------------------
 
 if [ $WANIPCIM == $MENTETTWANIP ] ; then
@@ -336,10 +386,12 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 	if [ $DYN_UPDATE == "igen" ] ; then
 
 		#---------------------------------------------------------------------
-		# DynDNS FRISSÍTÉS - TIMEOUT 15 SEC / DOMAIN
+		#- DynDNS FRISSÍTÉS - TIMEOUT 15 SEC / DOMAIN
 		#---------------------------------------------------------------------
-		# CIKLUSSAL MEGYÜNK VÉGIG A FRISSÍTENDŐ DOMAIN NEVEKEN
+		#- CIKLUSSAL MEGYÜNK VÉGIG A FRISSÍTENDŐ DOMAIN NEVEKEN
 		#---------------------------------------------------------------------
+
+		FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 
 		echo "$FULLDATUM - DINAMIKUS IP SZOLGALTATO: ${DYN_PROVIDER}"
 		echo "$FULLDATUM - DINAMIKUS IP SZOLGALTATO: ${DYN_PROVIDER}" >> $LOGFAJL
@@ -356,7 +408,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 				# Demo
 				echo "$FULLDATUM - ${DYN_UPD_URL}?${DYN_UPD_URL_PARAM1}=${DYN_DOMAIN[$i]}&${DYN_UPD_URL_PARAM2}=${WANIPCIM} --user-agent $DYN_USER_AGENT --connect-timeout 15 -k -s"
 
-				# Dynamic DNS UPDATE - DYN.COM / NOIP.COM
+				# DynDNS UPDATE
 				# curl "${DYN_UPD_URL}?${DYN_UPD_URL_PARAM1}=${DYN_DOMAIN[$i]}&${DYN_UPD_URL_PARAM2}=${WANIPCIM}" --user-agent $DYN_USER_AGENT --connect-timeout 15 -k -s
 				sleep 2
 
@@ -365,7 +417,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 		done
 
 		#---------------------------------------------------------------------
-		# NAPLÓZÁS
+		#- NAPLÓZÁS
 		#---------------------------------------------------------------------
 
 		FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
@@ -378,74 +430,39 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 
 	else
 
+		FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
 		echo "$FULLDATUM - DynDNS FRISSITES KIKAPCSOLVA..."
 		echo "$FULLDATUM - DynDNS FRISSITES KIKAPCSOLVA..." >> $LOGFAJL
 
 	fi
 
 	#---------------------------------------------------------------------
-	# VSFTPD SERVICE LEÁLLÍTÁSA
+	#- VSFTPD SERVICE LEÁLLÍTÁSA
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	echo "$FULLDATUM - VSFTPD LEALLITASA..."
 	# systemctl stop vsftpd.service
-	sleep 2
+	sleep 4
 
 	#---------------------------------------------------------------------
-	# NGINX SERVICE LEÁLLÍTÁSA
-	#---------------------------------------------------------------------
-
-	# FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-	# echo "$FULLDATUM - NGINX LEALLITASA..."
-	# systemctl stop nginx.service
-	# sleep 2
-
-	#---------------------------------------------------------------------
-	# PHP-FPM SERVICE LEÁLLÍTÁSA
-	#---------------------------------------------------------------------
-
-	# FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-	# echo "$FULLDATUM - PHP72-FPM LEALLITASA..."
-	# systemctl stop php72-php-fpm.service
-	# sleep 2
-
-	#---------------------------------------------------------------------
-	# NAPLÓZÁS
+	#- NAPLÓZÁS
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	echo "$FULLDATUM - SERVICEK LEALLITVA... WAN IP VALTOZOTT" >> $LOGFAJL
 
 	#---------------------------------------------------------------------
-	# PHP-FPM SERVICE INDÍTÁSA
-	#---------------------------------------------------------------------
-
-	# FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-	# echo "$FULLDATUM - PHP72-FPM INDITASA..."
-	# systemctl start php72-php-fpm.service
-	# sleep 2
-
-	#---------------------------------------------------------------------
-	# NGINX SERVICE INDÍTÁSA
-	#---------------------------------------------------------------------
-
-	# FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
-	# echo "$FULLDATUM - NGINX INDITASA..."
-	# systemctl start nginx.service
-	# sleep 2
-
-	#---------------------------------------------------------------------
-	# VSFTPD SERVICE INDÍTÁSA
+	#- VSFTPD SERVICE INDÍTÁSA
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	echo "$FULLDATUM - VSFTPD INDITASA..."
 	# systemctl start vsftpd.service
-	sleep 2
+	sleep 4
 
 	#---------------------------------------------------------------------
-	# WAN IP CÍM MEGVÁLTOZOTT - NAPLÓZÁS
+	#- WAN IP CÍM MEGVÁLTOZOTT - NAPLÓZÁS
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
@@ -460,7 +477,7 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 else
 
 	#---------------------------------------------------------------------
-	# NINCS VÁLTOZÁS - NAPLÓZÁS
+	#- NINCS VÁLTOZÁS - NAPLÓZÁS
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
