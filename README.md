@@ -18,8 +18,7 @@ A script beállításaiban korlátlan számú publikus IP API szolgáltatót leh
 UPD_URL[5]="https://api.peldaip.org.hu/"
 UPD_URL_NAME[5]="PELDAIP.ORG.HU"
 
-UPD_URL[...]="https://api.ex.org.hu/"
-UPD_URL_NAME[...]="EX.ORG.HU"
+...
 
 UPD_URL[10]="https://api.iphuex15.org.hu/"
 UPD_URL_NAME[10]="IPHUEX15.ORG.HU"
@@ -36,7 +35,7 @@ A script beállításaiban korlátlan számú frissítendő dinamikus domain nev
 
 DYN_DOMAIN[4]="pelda.dyndns.com"
 
-DYN_DOMAIN[...]="xxx.dyndns.com"
+...
 
 DYN_DOMAIN[15]="domain15.dyndns.com"
 
