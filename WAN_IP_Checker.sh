@@ -18,8 +18,6 @@
 #
 # TESZTELVE: Oracle Linux 9.2 / CentOS 7.9
 #
-# A SCRIPTET ÍRTA: C2H5Cl, Aethyl-chloride, 2019
-# FRISSÍTVE: 2023-06-18
 #---------------------------------------------------------------------
 
 
