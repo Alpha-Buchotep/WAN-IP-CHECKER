@@ -16,17 +16,14 @@
 #
 # A SCRIPT NAPLÓZZA MŰKÖDÉSÉT
 #
-# TESZTELVE: Oracle Linux 9.2 / CentOS 7.9
+# TESZTELVE: Oracle Linux 9.2 / CentOS 7.9.2009
 #
+# A SCRIPTET ÍRTA: C2H5Cl, Aethyl-chloride, 2019
+# FRISSÍTVE: 2023-06-19
 #---------------------------------------------------------------------
 
-
-#---------------------------------------------------------------------
-#---------------------------------------------------------------------
 #---------------------------------------------------------------------
 #--------------------------- BEÁLLÍTÁSOK -----------------------------
-#---------------------------------------------------------------------
-#---------------------------------------------------------------------
 #---------------------------------------------------------------------
 
 #---------------------------------------------------------------------
@@ -77,11 +74,11 @@ DYN_PROVIDER="dyn.com"
 DYN_UPDATE="igen"
 
 #---------------------------------------------------------------------
-#- DYN DNS USER / UPDATE KEY
+#- DYN DNS USER NÉV / UPDATER KEY
 #---------------------------------------------------------------------
 
 DYN_UN="dynUserName"
-DYN_UPD_KEY="DynUpdaterKey"
+DYN_UPD_KEY="dyn_updater_key"
 
 #---------------------------------------------------------------------
 #- NOIP USER / PASSWORD
@@ -94,17 +91,24 @@ NOIP_PWD="noipPassword"
 # FRISSITENDO DOMAIN NEVEK
 #
 # TETSZŐLEGESEN BŐVÍTHETŐ / CSÖKKENTHETŐ A LISTA
+# MAX. 20 HOST
 #---------------------------------------------------------------------
 
-DYN_DOMAIN[1]="domain1.dyndns.com"
-DYN_DOMAIN[2]="domain2.dyndns.com"
-DYN_DOMAIN[3]="domain3.dyndns.com"
+DYN_DOMAIN[1]="mydyndomain.dyndns.org"
+DYN_DOMAIN[2]="example.is-a-geek.org"
+DYN_DOMAIN[3]="hello.dyndns.com"
+DYN_DOMAIN[4]="mypodcast.mine.nu"
+DYN_DOMAIN[5]="iamastreamer.selfip.org"
 
 #---------------------------------------------------------------------
+#- CURL USER AGENT BEÁLLÍTÁS (NO-IP.COM MEGKÖVETELI)
+#---------------------------------------------------------------------
+
+DYN_USER_AGENT="bash-curl-cron/1.0 anonymous@mail.xyz"
+
 #---------------------------------------------------------------------
 #---------------------------------------------------------------------
 #------------------------- BEÁLLÍTÁSOK VÉGE --------------------------
-#---------------------------------------------------------------------
 #---------------------------------------------------------------------
 #---------------------------------------------------------------------
 
@@ -169,10 +173,8 @@ if [ -z $DYN_DOMAIN_LEN ] || [ $DYN_DOMAIN_LEN == 0 ] ; then
 fi
 
 #---------------------------------------------------------------------
-#- DINAMIKUS IP / DNS SZOLGÁLTATÓ BEÁLLÍTÁSOK + USER AGENT
+#- DINAMIKUS IP / DNS SZOLGÁLTATÓ BEÁLLÍTÁSOK
 #---------------------------------------------------------------------
-
-DYN_USER_AGENT="bash-curl-cron/1.0 anonymous@mail.wxyz"
 
 # dyn.com
 if [ ! -z $DYN_PROVIDER ] && [ $DYN_PROVIDER == "dyn.com" ] ; then
@@ -212,6 +214,8 @@ MENTETTWANIP="x"
 IPCIMTXT="x"
 FRISSITSUNK="x"
 UPDSVC="x"
+HOSTNEVEK="x"
+JELALLAPOT="x"
 
 #---------------------------------------------------------------------
 #- LOG DIR LÉTREHOZÁSA, HA NEM LÉTEZIK
@@ -384,9 +388,10 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 	if [ $DYN_UPDATE == "igen" ] ; then
 
 		#---------------------------------------------------------------------
-		#- DynDNS FRISSÍTÉS - TIMEOUT 15 SEC / DOMAIN
+		#- DynDNS FRISSÍTÉS - TIMEOUT 15 SEC / MAX. 20 DOMAIN / KÉRÉS
 		#---------------------------------------------------------------------
-		#- CIKLUSSAL MEGYÜNK VÉGIG A FRISSÍTENDŐ DOMAIN NEVEKEN
+		#- CIKLUSSAL MEGYÜNK VÉGIG A FRISSÍTENDŐ DOMAIN NEVEKEN,
+		#- AZOKAT TÖMBBE TESSZÜK
 		#---------------------------------------------------------------------
 
 		FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
@@ -394,25 +399,44 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 		echo "$FULLDATUM - DINAMIKUS IP SZOLGALTATO: ${DYN_PROVIDER}"
 		echo "$FULLDATUM - DINAMIKUS IP SZOLGALTATO: ${DYN_PROVIDER}" >> $LOGFAJL
 
+		HOSTNEVEK=""
+
 		for (( i=0; i<=${DYN_DOMAIN_LEN}; i++ )) ; do
 
 			if [ ! -z "${DYN_DOMAIN[$i]}" ] ; then
 
 				FULLDATUM=$(date +"%Y-%m-%d_%H-%M-%S")
 
-				echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..."
-				echo "$FULLDATUM - ${DYN_DOMAIN[$i]} FRISSITESE..." >> $LOGFAJL
+				echo "$FULLDATUM - ${DYN_DOMAIN[$i]} HOZZAADASA A LISTAHOZ..."
+				echo "$FULLDATUM - ${DYN_DOMAIN[$i]} HOZZAADASA A LISTAHOZ..." >> $LOGFAJL
 
-				# Demo
-				echo "$FULLDATUM - ${DYN_UPD_URL}?${DYN_UPD_URL_PARAM1}=${DYN_DOMAIN[$i]}&${DYN_UPD_URL_PARAM2}=${WANIPCIM} --user-agent $DYN_USER_AGENT --connect-timeout 15 -k -s"
-
-				# DynDNS UPDATE
-				# curl "${DYN_UPD_URL}?${DYN_UPD_URL_PARAM1}=${DYN_DOMAIN[$i]}&${DYN_UPD_URL_PARAM2}=${WANIPCIM}" --user-agent $DYN_USER_AGENT --connect-timeout 15 -k -s
-				sleep 2
-
+				if [ $i == ${DYN_DOMAIN_LEN} ] ; then
+				    HOSTNEVEK+="${DYN_DOMAIN[$i]}"
+				else
+				    HOSTNEVEK+="${DYN_DOMAIN[$i]},"
+				fi
 			fi
-
 		done
+
+		#---------------------------------------------------------------------
+
+		echo "$FULLDATUM - A KOVETKEZO DOMAIN NEVEK KERULNEK FRISSITESRE:"
+		echo "$FULLDATUM - ${HOSTNEVEK}"
+
+		echo "$FULLDATUM - A KOVETKEZO DOMAIN NEVEK KERULNEK FRISSITESRE:" >> $LOGFAJL
+		echo "$FULLDATUM - ${HOSTNEVEK}" >> $LOGFAJL
+
+		echo "$FULLDATUM - DYN DNS FRISSITES INDUL..."
+		echo "$FULLDATUM - DYN DNS FRISSITES INDUL..." >> $LOGFAJL
+
+		# FRISSÍTÉS
+  		ALLAPOT=$(curl "${DYN_UPD_URL}?${DYN_UPD_URL_PARAM1}=${HOSTNEVEK}&${DYN_UPD_URL_PARAM2}=${WANIPCIM}" --user-agent ${DYN_USER_AGENT} --connect-timeout 15 -k -s)
+		
+		echo "$FULLDATUM - DYN DNS FRISSITES EREDMENYE:"
+		echo "${ALLAPOT}"
+
+		echo "$FULLDATUM - DYN DNS FRISSITES EREDMENYE:" >>$LOGFAJL
+		echo "$FULLDATUM - ${ALLAPOT}" >> $LOGFAJL
 
 		#---------------------------------------------------------------------
 		#- NAPLÓZÁS
@@ -435,13 +459,13 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 	fi
 
 	#---------------------------------------------------------------------
-	#- VSFTPD SERVICE LEÁLLÍTÁSA
+	#- VSFTPD SERVICE LEÁLLÍTÁSA (DEMO)
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	echo "$FULLDATUM - VSFTPD LEALLITASA..."
-	# systemctl stop vsftpd.service
-	sleep 4
+	#systemctl stop vsftpd.service
+	#sleep 3
 
 	#---------------------------------------------------------------------
 	#- NAPLÓZÁS
@@ -451,13 +475,13 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 	echo "$FULLDATUM - SERVICEK LEALLITVA... WAN IP VALTOZOTT" >> $LOGFAJL
 
 	#---------------------------------------------------------------------
-	#- VSFTPD SERVICE INDÍTÁSA
+	#- VSFTPD SERVICE INDÍTÁSA (DEMO)
 	#---------------------------------------------------------------------
 
 	FULLDATUM=$(date +"%Y-%m-%d %H-%M-%S")
 	echo "$FULLDATUM - VSFTPD INDITASA..."
-	# systemctl start vsftpd.service
-	sleep 4
+	#systemctl start vsftpd.service
+	#sleep 3
 
 	#---------------------------------------------------------------------
 	#- WAN IP CÍM MEGVÁLTOZOTT - NAPLÓZÁS
@@ -470,7 +494,6 @@ if [ $FRISSITSUNK == "yes" ] || [ $IPCIMTXT == "nOk" ] ; then
 	echo "$FULLDATUM - AKTUALIS WAN IP: $WANIPCIM" >> $LOGFAJL
 	echo "$FULLDATUM - FRISSITESI SZOLGALTATAS: $UPDSVC" >> $LOGFAJL
 	echo "====================================================================================" >> $LOGFAJL
-	sleep 2
 
 else
 
