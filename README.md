@@ -26,7 +26,7 @@ UPD_URL_NAME[10]="IPHUEX15.ORG.HU"
 stb.
 ```
 
-A script beállításaiban korlátlan számú frissítendő dinamikus domain nevet lehet beállítani.
+A script beállításaiban maximum 20 db frissítendő dinamikus domain nevet lehet beállítani.
 
 
 **Példa egy új dinamikus domain felvételére:**
@@ -47,51 +47,4 @@ stb.
 * Oracle Linux 9.2 x64
 * CentOS Linux 7.9.2009 x64
 
-
-#### Konzol kimenet
-
-```
-
-2023-06-17 22-51-00 - IP CHECK ELINDULT...
-2023-06-17 22-51-00 - https://api.ipify.org - WAN IP LEKERDEZESE...
-2023-06-17 22-51-01 - https://api.ipify.org - VALID IP CIM: 80.10.20.30
-2023-06-17 22-51-01 - IP CIM TXT FAJL /var/log/wanipaddress.txt LETEZIK...
-2023-06-17 22-51-01 - JELENLEGI WAN IP CIM: 80.10.20.30
-2023-06-17 22-51-01 - KORABBI WAN IP CIM: 2001:0Db8:85a3:0000:0000:8a2e:0370:7334
-2023-06-17 22-51-01 - WAN IP VALTOZOTT
-2023-06-17 22-51-01 - DINAMIKUS IP SZOLGALTATO: dyn.com
-2023-06-17_22-51-01 - domain1.dyndns.com FRISSITESE...
-2023-06-17_22-51-01 - https://userName:1234567890abcdef1234567890abcde@members.dyndns.org/v3/update?hostname=domain1.dyndns.com&myip=80.10.20.30 --user-agent bash-curl-cron/1.0 anonymous@mail.wxyz --connect-timeout 15 -k -s
-2023-06-17_22-51-09 - domain2.dyndns.com FRISSITESE...
-2023-06-17_22-51-09 - https://userName:1234567890abcdef1234567890abcde@members.dyndns.org/v3/update?hostname=domain2.dyndns.com&myip=80.10.20.30 --user-agent bash-curl-cron/1.0 anonymous@mail.wxyz --connect-timeout 15 -k -s
-2023-06-17_22-51-14 - domain3.dyndns.com FRISSITESE...
-2023-06-17_22-51-14 - https://userName:1234567890abcdef1234567890abcde@members.dyndns.org/v3/update?hostname=domain3.dyndns.com&myip=80.10.20.30 --user-agent bash-curl-cron/1.0 anonymous@mail.wxyz --connect-timeout 15 -k -s
-2023-06-17_22-51-17 - DynDNS FRISSITESEK BEFEJEZVE... SERVICEK UJRAINDITASA...
-2023-06-17 22-51-17 - VSFTPD LEALLITASA...
-2023-06-17 22-51-19 - VSFTPD INDITASA...
-2023-06-17 22-51-21 - FRISSITES KESZ... (IPIFY.ORG)
-
-```
-
-### Log fájl kimenet
-
-```
-
-2023-06-17 22-51-00 - IP CHECK ELINDULT...
-2023-06-17 22-51-00 - https://api.ipify.org - WAN IP LEKERDEZESE...
-2023-06-17 22-51-01 - https://api.ipify.org - VALID IP CIM: 80.10.20.30
-2023-06-17 22-51-01 - IP CIM TXT FAJL /var/log/wanipaddress.txt LETEZIK
-2023-06-17 22-51-01 - DINAMIKUS IP SZOLGALTATO: dyn.com
-2023-06-17_22-51-01 - domain1.dyndns.com FRISSITESE...
-2023-06-17_22-51-09 - domain2.dyndns.com FRISSITESE...
-2023-06-17_22-51-14 - domain3.dyndns.com FRISSITESE...
-2023-06-17_22-51-17 - DynDNS FRISSITESEK BEFEJEZVE...
-2023-06-17_22-51-17 - SERVICEK UJRAINDITASA...
-2023-06-17 22-51-19 - SERVICEK LEALLITVA... WAN IP VALTOZOTT
-2023-06-17 22-51-21 - SERVICEK UJRAINDITVA... WAN IP VALTOZOTT
-2023-06-17 22-51-21 - ELOZO WAN IP: 2001:0Db8:85a3:0000:0000:8a2e:0370:7334
-2023-06-17 22-51-21 - AKTUALIS WAN IP: 80.10.20.30
-2023-06-17 22-51-21 - FRISSITESI SZOLGALTATAS: IPIFY.ORG
-
-```
 
