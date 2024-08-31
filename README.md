@@ -46,5 +46,6 @@ stb.
 
 * Oracle Linux 9.2 x64
 * CentOS Linux 7.9.2009 x64
+* Rocky Linux 9.4 x64
 
 
